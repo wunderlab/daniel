@@ -1,73 +1,240 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-<title>danielmarkel.com</title>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1" />
-<meta name="Author" content="danielmarkel.com" />
-<meta name="Keywords" content="danielmarkel.com" />
-<meta name="Description" content="danielmarkel.com" />
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="manifest" href="/site.webmanifest">
-<script>
-if (window.top!==window.self) window.top.location=window.self.location;
-</script>
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-745RW34924"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-745RW34924');
-</script>
-	
-<style>
-html, body, div, span, h1, h2, p, a, img, strong, b, u, i, center, ul, li,
-form, label, table, tbody, thead, tr, th, td  {
-  margin: 0;
-  padding: 0;
-  border: none;
-  outline: 0 !important;
-}
-img
-{
-  vertical-align: middle;
-  max-width: 100%;
-}
-html { height:100%; background:#000; }
-body
-{
-  margin: 0;
-  min-height: 100%;
-  display: table;
-  width: 100%;
-  height: 100%;
-  text-align: center;
-  font-family: sans-serif;
-  font-size: 20px;
-  line-height: 1.428571429;
-  color: #fff;
-  background: #000;
-}
-
-a,a:hover{text-decoration:none;}
-
-.box
-{
-  display:table-cell;
-  vertical-align:middle;
-}
-
-</style>
+  <title></title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300;400&display=swap" rel="stylesheet">
 </head>
+<style>
+  html {
+    height: 100%;
+    box-sizing: border-box;
+  }
 
-<body class="body">
-	<div class="box">
-	  <img src="/images/image.jpg" alt="danielmarkel.com" />
-  </div> 
+  * {
+    box-sizing: inherit;
+  }
+
+  body {
+    background-color: #000;
+    color: #333;
+    font: 1.2em / 1.5 Helvetica Neue, Helvetica, Arial, sans-serif;
+    padding: 0;
+    margin: 0;
+    height: 100%;
+    min-height: 100vh;
+    background-size: cover;
+  }
+
+  .wrapper {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .cell {
+    display: inline-block;
+    color: #5b7097;
+    text-align: center;
+    width: 30px;
+    height: 30px;
+  }
+
+  .cell.pop {
+    color: #172e68;
+    background-color: #5b7097;
+  }
 
 
+  header,
+  footer {
+    background-color: transparent;
+    color: #fff;
+    padding: 20px;
+  }
+
+
+  footer {
+    text-align: center;
+    font-size: 40px;
+  }
+
+  .inquire {
+    font-size: 32px;
+    color: #fff;
+    text-decoration: none;
+  }
+
+  .inquire:hover {
+    color: #ffc107;
+  }
+
+  .modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgb(33 150 243 / 82%);
+    z-index: 100;
+    overflow: hidden;
+    opacity: 0;
+    transition: opacity .7s ease
+  }
+
+  .contact-form {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    font-size: 24px;
+    border-radius: 10px;
+    padding: 50px 0;
+    background: #111;
+    color: #fff;
+    z-index: 1000;
+    box-shadow: 20px 20px 1px 1px rgb(0 0 255 / 20%);
+    min-width: 320px;
+    max-width: 90%;
+    width: 30%;
+    height: 40%;
+    max-height: 30%;
+    min-height: 100px;
+  }
+
+  .contact-form>div {
+    transform: translate(0, -50%);
+    top: 50%;
+    position: relative;
+  }
+</style>
+
+<body>
+  <div class="wrapper"></div>
+
+
+  <script>
+    (function () {
+      const h = 30,
+        w = 30,
+        body = document.querySelector('body'),
+        wrapper = document.querySelector('.wrapper'),
+        alpha = 'abcdefghijklmnopqrstuvwxyz',
+        symbols = '0123456789'.repeat(5) + alpha + alpha.toUpperCase();
+      let T;
+
+
+      const refill = () => {
+        let H = body.clientHeight,
+          W = body.clientWidth,
+          Nw = Math.floor(W / w),
+          Nh = Math.floor(H / h),
+          L = symbols.length;
+
+        body.style.padding = (H - Nh * h) / 2 + 'px 0 0 ' + (W - Nw * w) / 2 + 'px';
+        if (T) clearTimeout(T);
+        wrapper.replaceChildren();
+
+        for (let k = 1; k <= Nh * Nw; k++) {
+          let div = document.createElement('div'),
+            r = Math.floor(Math.random() * L);
+
+          div.textContent = symbols[r];
+          div.className = 'cell';
+          if (Math.floor(Math.random() * 2) == 1) div.style.color = "rgb(182, 194, 217)";
+          wrapper.appendChild(div);
+        }
+
+
+        const arr = [], lim = 5;
+        const cells = wrapper.children, l = cells.length;
+
+        const pops = (delay = 1000) => {
+          return setTimeout(() => {
+            let n = Math.floor(Math.random() * l), cell = cells[n];
+            if (arr.length < lim) {
+              arr.push(n);
+              cell.classList.add('pop');
+            }
+            else {
+              cells[arr.shift()].classList.remove('pop');
+            }
+            pops();
+          },
+            Math.floor(Math.random() * delay));
+        }
+
+        T = cycle();
+        P = pops();
+      }
+
+      const change = () => {
+        const cells = wrapper.children,
+          L = symbols.length,
+          l = cells.length;
+        let n = Math.floor(Math.random() * l),
+          r = Math.floor(Math.random() * L),
+          cell = cells[n];
+
+        cell.textContent = symbols[r];
+      }
+
+      const cycle = (delay = 5) => {
+        return setTimeout(() => {change(); cycle();}, delay);
+      }
+
+
+
+      const debounce = (callback, wait) => {
+        let timeout = null;
+        return (...args) => {
+          window.clearTimeout(timeout);
+          timeout = window.setTimeout(() => {
+            callback.apply(null, args);
+          }, wait);
+        };
+      }
+
+      window.onresize = debounce(refill, 100);
+
+      refill();
+
+
+
+      body.addEventListener('click', (e) => {
+        e.preventDefault();
+        let modal = document.createElement('div');
+        modal.className = 'modal';
+        modal.innerHTML = '<div class="contact-form"><div>Press ESC now!<br></div></div>';
+        body.appendChild(modal);
+
+        setTimeout(() => {
+          modal.style.opacity = 1;
+        }
+          , 0);
+
+        modal.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (modal == e.target) modalRemove();
+        });
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape") modalRemove();
+        });
+
+        modalRemove = () => {
+          modal.ontransitionend = () => {modal.remove();}
+          setTimeout(() => {
+            modal.style.opacity = 0;
+          }
+            , 0);
+        }
+      })
+    })()
+  </script>
 </body>
-</html>
 
+</html>
