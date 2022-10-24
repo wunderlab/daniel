@@ -169,17 +169,10 @@
             Math.floor(Math.random() * delay));
         }
 
-        T = cycle();
-        P = pops();
-      }
-
-      const change = () => {
-        const cells = wrapper.children,
-          L = symbols.length,
-          l = cells.length;
-        let n = Math.floor(Math.random() * l),
-          r = Math.floor(Math.random() * L),
-          cell = cells[n];
+        const change = () => {
+            let n = Math.floor(Math.random() * l),
+                r = Math.floor(Math.random() * L),
+                cell = cells[n];
 
         cell.textContent = symbols[r];
       }
@@ -187,6 +180,13 @@
       const cycle = (delay = 5) => {
         return setTimeout(() => {change(); cycle();}, delay);
       }
+      
+      
+        T = cycle();
+        P = pops();
+      }
+
+
 
 
 
