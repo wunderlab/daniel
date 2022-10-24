@@ -126,6 +126,7 @@
         alpha = 'abcdefghijklmnopqrstuvwxyz',
         symbols = '0123456789'.repeat(5) + alpha + alpha.toUpperCase();
       let T, P;
+      const arr, lim = 5;
 
 
       const refill = () => {
@@ -150,10 +151,8 @@
           wrapper.appendChild(div);
         }
 
-
-        const arr = [], lim = 5;
         const cells = wrapper.children, l = cells.length;
-
+        arr = [];
         const pops = (delay = 1000) => {
           return setTimeout(() => {
             let n = Math.floor(Math.random() * l), cell = cells[n];
@@ -185,10 +184,6 @@
         T = cycle();
         P = pops();
       }
-
-
-
-
 
       const debounce = (callback, wait) => {
         let timeout = null;
