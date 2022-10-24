@@ -136,7 +136,8 @@
           L = symbols.length;
 
         body.style.padding = (H - Nh * h) / 2 + 'px 0 0 ' + (W - Nw * w) / 2 + 'px';
-        if (T) clearTimeout(T);
+        clearTimeout(T);
+        clearTimeout(P);
         wrapper.replaceChildren();
 
         for (let k = 1; k <= Nh * Nw; k++) {
