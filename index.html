@@ -35,15 +35,22 @@
     overflow: hidden;
   }
 
-  .cell {
+  .wrapper > div {
     display: inline-block;
-    color: #5b7097;
     text-align: center;
     width: 30px;
     height: 30px;
   }
 
-  .cell.pop {
+  .cell1 {
+	color:  #5b7097;
+  }
+  
+  .cell2 {
+	color: rgb(182, 194, 217);
+  }
+	
+  .pop {
     color: #172e68;
     background-color: #5b7097;
   }
@@ -118,92 +125,118 @@
 
 
   <script>
-    (function () {
-      const h = 30,
-        w = 30,
-        body = document.querySelector('body'),
-        wrapper = document.querySelector('.wrapper'),
-        alpha = 'abcdefghijklmnopqrstuvwxyz',
-        symbols = '0123456789'.repeat(5) + alpha + alpha.toUpperCase();
-      let T, P, arr;
-      const lim = 5;
+
+	const h = 30,
+	w = 30,
+	body = document.querySelector('body'),
+	wrapper = document.querySelector('.wrapper'),
+	alpha = 'abcdefghijklmnopqrstuvwxyz',
+	symbols = '0123456789'.repeat(5) + alpha + alpha.toUpperCase(),
+	L = symbols.length,
+	lim = 5;
+	 
+	let arr;
+
+	const setRandomStyle = (cell) => {
+		const styleNum = 2;
+		let style = Math.floor(Math.random()*styleNum +1);
+		cell.className = 'cell'+style;
+		return cell;
+	}
+			
+	const change = () => { 
+		const cells = wrapper.children, 
+				  Lc = cells.length;
+		let n = Math.floor(Math.random() * Lc),
+			r = Math.floor(Math.random() * L),
+			cell = cells[n];
+
+		cell.textContent = symbols[r];
+		setRandomStyle(cell);
+	}
 
 
+	const cycle = (function() {
+		let reg = [];
+		return function recycle(fn, delay) {  if (fn == 0) { console.log(reg); return; }
+			if (!fn.name) return; 
+			let already = reg.findIndex((el) => el[0] === fn.name);
+			if (already != -1) window.clearTimeout(reg[already][1]);
+			if (delay == -1) {
+				if (already == -1) return 0; 
+				let del = reg.splice(already, 1);
+				console.log(`got -1 for ${fn.name} in `, reg, ` deleted ${del} entry`);
+				return -1;
+			}
+			
+			fn();
+			let T = window.setTimeout(function() { recycle(fn, delay) }, delay);
+			if (already == -1) reg.push([fn.name, T]); else reg[already][1] = T;
+			
+		};
+	})();
+
+
+	const pops = () => {
+		const cells = wrapper.children, 
+				  Lc = cells.length;
+ 
+		let n = Math.floor(Math.random() * Lc), 
+			 cell = cells[n];
+			 
+		if (arr.length < lim) {
+		  arr.push(n);
+		  cell.classList.add('pop');
+		}
+		else {
+			setRandomStyle(cells[arr.shift()]);
+		}
+	}
+   
       const refill = () => {
-        let H = body.clientHeight,
-          W = body.clientWidth,
-          Nw = Math.floor(W / w),
-          Nh = Math.floor(H / h),
-          L = symbols.length;
-
-        body.style.padding = (H - Nh * h) / 2 + 'px 0 0 ' + (W - Nw * w) / 2 + 'px';
-        clearTimeout(T);
-        clearTimeout(P);
-        wrapper.replaceChildren();
-
+			const H = body.clientHeight,
+				  W = body.clientWidth,
+				  Nw = Math.floor(W / w),
+				  Nh = Math.floor(H / h);
+			  
+			arr = [];
+			body.style.padding = (H - Nh * h) / 2 + 'px 0 0 ' + (W - Nw * w) / 2 + 'px';
+			wrapper.replaceChildren();
+		
         for (let k = 1; k <= Nh * Nw; k++) {
-          let div = document.createElement('div'),
-            r = Math.floor(Math.random() * L);
+			let cell = document.createElement('div'),
+				r = Math.floor(Math.random() * L);
 
-          div.textContent = symbols[r];
-          div.className = 'cell';
-          if (Math.floor(Math.random() * 2) == 1) div.style.color = "rgb(182, 194, 217)";
-          wrapper.appendChild(div);
+			cell.textContent = symbols[r];
+		  
+			setRandomStyle(cell);
+			wrapper.appendChild(cell);
         }
 
-        const cells = wrapper.children, l = cells.length;
-        arr = [];
-        const pops = (delay = 1000) => {
-          return setTimeout(() => {
-            let n = Math.floor(Math.random() * l), cell = cells[n];
-            if (arr.length < lim) {
-              arr.push(n);
-              cell.classList.add('pop');
-            }
-            else {
-              cells[arr.shift()].classList.remove('pop');
-            }
-            pops();
-          },
-            Math.floor(Math.random() * delay));
-        }
-
-        const change = () => {
-            let n = Math.floor(Math.random() * l),
-                r = Math.floor(Math.random() * L),
-                cell = cells[n];
-
-        cell.textContent = symbols[r];
-      }
-
-      const cycle = (delay = 5) => {
-        return setTimeout(() => {change(); cycle();}, delay);
-      }
-      
-      
-        T = cycle();
-        P = pops();
+        cycle(change, 50);
+        cycle(pops, 300);
       }
 
       const debounce = (callback, wait) => {
-        let timeout = null;
-        return (...args) => {
-          window.clearTimeout(timeout);
-          timeout = window.setTimeout(() => {
-            callback.apply(null, args);
-          }, wait);
-        };
-      }
+			let timeout = null;
+			return (...args) => {
+				window.clearTimeout(timeout);
+				timeout = window.setTimeout(() => {
+					callback.apply(null, args);
+				}, wait);
+			};
+		}
 
       window.onresize = debounce(refill, 100);
-
       refill();
 
 
 
-      body.addEventListener('click', (e) => {
+     document.body.addEventListener('click', (e) => {
         e.preventDefault();
         let modal = document.createElement('div');
+		const body = document.querySelector('body');
+			  
         modal.className = 'modal';
         modal.innerHTML = '<div class="contact-form"><div>Press ESC<br>NOW !!!</div></div>';
         body.appendChild(modal);
@@ -222,14 +255,17 @@
         });
 
         modalRemove = () => {
-          modal.ontransitionend = () => {modal.remove();}
-          setTimeout(() => {
-            modal.style.opacity = 0;
-          }
+			modal.ontransitionend = () => { 
+				modal.remove();
+			}
+			setTimeout(() => {
+				modal.style.opacity = 0;
+			}
             , 0);
         }
       })
-    })()
+	  
+
   </script>
 </body>
 
