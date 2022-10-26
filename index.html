@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>DM</title>
+  <title></title>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
@@ -38,8 +38,8 @@
   .wrapper > div {
     display: inline-block;
     text-align: center;
-    width: 30px;
-    height: 30px;
+	width: 30px;
+	height: 30px;
   }
 
   .cell1 {
@@ -127,15 +127,14 @@
   <script>
 
 	const h = 30,
-	w = 30,
-	body = document.querySelector('body'),
-	wrapper = document.querySelector('.wrapper'),
-	alpha = 'abcdefghijklmnopqrstuvwxyz',
-	symbols = '0123456789'.repeat(5) + alpha + alpha.toUpperCase(),
-	L = symbols.length,
-	lim = 5;
+			w = 30,
+			body = document.querySelector('body'),
+			wrapper = document.querySelector('.wrapper'),
+			alpha = 'abcdefghijklmnopqrstuvwxyz',
+			symbols = '0123456789'.repeat(5) + alpha + alpha.toUpperCase(),
+			L = symbols.length;
 	 
-	let arr;
+	
 
 	const setRandomStyle = (cell) => {
 		const styleNum = 2;
@@ -157,8 +156,9 @@
 
 
 	const cycle = (function() {
-		let reg = [];
-		return function recycle(fn, delay) {  if (fn == 0) { console.log(reg); return; }
+		let reg = []; 
+		return function recycle(fn, delay) {
+			if (fn == 0) { console.log(reg); return; }
 			if (!fn.name) return; 
 			let already = reg.findIndex((el) => el[0] === fn.name);
 			if (already != -1) window.clearTimeout(reg[already][1]);
@@ -170,6 +170,7 @@
 			}
 			
 			fn();
+			if ("undefined" === typeof delay) delay = Math.round(Math.random()*400 + 900);
 			let T = window.setTimeout(function() { recycle(fn, delay) }, delay);
 			if (already == -1) reg.push([fn.name, T]); else reg[already][1] = T;
 			
@@ -179,42 +180,43 @@
 
 	const pops = () => {
 		const cells = wrapper.children, 
-				  Lc = cells.length;
- 
-		let n = Math.floor(Math.random() * Lc), 
-			 cell = cells[n];
+				  Lc = cells.length,
+				  lim = 5; 
+		let arr = wrapper.querySelectorAll(".pop"),
+			  rand = Math.round(Math.random());
 			 
-		if (arr.length < lim) {
-		  arr.push(n);
-		  cell.classList.add('pop');
+		if (rand < .5 || arr.length == 0) {
+      n = Math.floor(Math.random() * Lc), 
+			cells[n].classList.add('pop');
 		}
 		else {
-			setRandomStyle(cells[arr.shift()]);
+			let i = Math.floor(Math.random()*arr.length);
+			arr[i].classList.remove('pop');
+			setRandomStyle(arr[i]);
 		}
 	}
+	
    
-      const refill = () => {
+  const refill = () => {
 			const H = body.clientHeight,
 				  W = body.clientWidth,
 				  Nw = Math.floor(W / w),
 				  Nh = Math.floor(H / h);
 			  
-			arr = [];
 			body.style.padding = (H - Nh * h) / 2 + 'px 0 0 ' + (W - Nw * w) / 2 + 'px';
 			wrapper.replaceChildren();
 		
-        for (let k = 1; k <= Nh * Nw; k++) {
+    for (let k = 1; k <= Nh * Nw; k++) {
 			let cell = document.createElement('div'),
 				r = Math.floor(Math.random() * L);
 
 			cell.textContent = symbols[r];
-		  
 			setRandomStyle(cell);
 			wrapper.appendChild(cell);
         }
 
         cycle(change, 50);
-        cycle(pops, 300);
+        cycle(pops);
       }
 
       const debounce = (callback, wait) => {
