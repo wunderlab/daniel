@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>d.m.</title>
+    <style type="text/css">
+        body {
+            background-color: #352879;
+            color: #8888FF;
+            font-family: "Courier New", Courier, monospace;
+            font-size: 16px;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.5;
+        }
+
+        #container {
+            max-width: 640px;
+            margin: 0 auto;
+            border: 2px solid #8888FF;
+            padding: 20px;
+            background-color: #352879;
+        }
+
+        #content {
+            white-space: pre-wrap;
+            text-transform: uppercase;
+        }
+
+        #cursor {
+            display: inline-block;
+            width: 10px;
+            height: 18px;
+            background-color: #8888FF;
+            vertical-align: text-bottom;
+            position: relative;
+            top: -2px;
+            animation: blink 1s step-end infinite;
+        }
+
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        h1 {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                font-size: 14px;
+                padding: 10px;
+            }
+            #container {
+                max-width: 100%;
+                padding: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                font-size: 12px;
+                padding: 5px;
+            }
+            #container {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <h1>*** commodore 64 basic v2 ***</h1>
+        <div id="content"><span id="cursor"></span></div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", async function() {
+            const content = document.getElementById("content");
+            const cursor = document.getElementById("cursor");
+            const h1 = document.querySelector("h1").textContent;
+            const initialText = [
+                h1 + "\n",
+                " 64K RAM SYSTEM  38911 BASIC BYTES FREE\n",
+                "\n",
+                "READY.\n"
+            ].join("");
+            let currentText = initialText;
+            let index = 0;
+            let isTyping = true;
+            let promptPosition = 0;
+            let currentInput = '';
+
+            let userIP = 'UNKNOWN';
+            let userCity = 'UNKNOWN';
+            let userCountry = 'UNKNOWN';
+            try {
+                const geoResponse = await fetch('https://ipapi.co/json/');
+                const geoData = await geoResponse.json();
+                userIP = geoData.ip || 'UNKNOWN';
+                userCity = geoData.city || 'UNKNOWN';
+                userCountry = geoData.country_name || 'UNKNOWN';
+            } catch (error) {
+                console.log('Failed to fetch geo data:', error);
+            }
+
+            function typeCharacter() {
+                if (index < currentText.length) {
+                    content.textContent += currentText[index];
+                    content.appendChild(cursor);
+                    index++;
+                    const pause = currentText[index] === "\n" ? 250 : 20 + Math.random() * 10;
+                    setTimeout(typeCharacter, pause);
+                } else {
+                    isTyping = false;
+                    promptPosition = content.textContent.length;
+                }
+            }
+
+            content.textContent = "";
+            typeCharacter();
+
+            document.addEventListener('keydown', function(e) {
+                if (isTyping) return;
+
+                const key = e.key;
+
+                if (key.length === 1 && /[a-zA-Z0-9 !@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(key)) {
+                    content.textContent += key.toUpperCase();
+                    currentInput += key.toUpperCase();
+                    content.appendChild(cursor);
+                } else if (key === 'Backspace') {
+                    if (content.textContent.length > promptPosition) {
+                        content.textContent = content.textContent.slice(0, -1);
+                        currentInput = currentInput.slice(0, -1);
+                        content.appendChild(cursor);
+                    }
+                } else if (key === 'Enter') {
+                    content.textContent += '\n';
+                    content.appendChild(cursor);
+                    isTyping = true;
+
+                    setTimeout(() => {
+                        let reply;
+                        if (currentInput.trim() === '') {
+                            reply = '?SYNTAX ERROR\n\nREADY.\n';
+                        } else {
+                            reply = getRandomReply() + '\n\nREADY.\n';
+                        }
+                        currentText = reply;
+                        index = 0;
+                        currentInput = '';
+                        typeCharacter();
+                    }, 500 + Math.random() * 200);
+                }
+            });
+
+            function getRandomReply() {
+                const currentDate = new Date().toDateString();
+                const replies = [
+                    'CALCULATION COMPLETE: PI ≈ ' + Math.PI.toFixed(5),
+                    'RANDOM INTEGER: ' + Math.floor(Math.random() * 100),
+                    'FIBONACCI SEQUENCE (UP TO 10): 0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55',
+                    'SYSTEM TIMESTAMP: ' + new Date().toLocaleString(),
+                    'E = MC² SIMULATION: ENERGY = ' + (Math.random() * 100).toFixed(2) + ' JOULES',
+                    'PRIME NUMBER CHECK: 42 IS NOT PRIME',
+                    'RANDOM VECTOR: [' + Math.floor(Math.random() * 10) + ', ' + Math.floor(Math.random() * 10) + ', ' + Math.floor(Math.random() * 10) + ']',
+                    'TEMPERATURE READING: ' + (Math.random() * 50 + 20).toFixed(1) + '°C',
+                    'BINARY CONVERSION: 255 = 11111111',
+                    'QUANTUM BIT FLIP: ' + (Math.random() > 0.5 ? '1' : '0'),
+                    'HELLO! WELCOME TO C64 BASIC.',
+                    'HOW CAN I ASSIST YOU TODAY?',
+                    'GREETINGS FROM THE 1980S!',
+                    'READY FOR SOME RETRO COMPUTING?',
+                    'WHAT WOULD YOU LIKE TO COMPUTE?',
+                    'SYSTEM STATUS: ALL SYSTEMS NOMINAL.',
+                    'HAVE A QUESTION? ASK AWAY!',
+                    'LOADING FUN FACT: THE C64 HAD 64 KB RAM.',
+                    'THANKS FOR VISITING OUR VIRTUAL MACHINE!',
+                    'TODAY IS ' + currentDate + '.',
+                    'CURRENT DATE: ' + currentDate,
+                    'YOUR IP ADDRESS: ' + userIP,
+                    'LOCATION: ' + userCity + ', ' + userCountry,
+                    'GEO DATA: CITY=' + userCity + ' COUNTRY=' + userCountry,
+                    'SYSTEM DATE: ' + currentDate + ' IP: ' + userIP,
+                    '"GOD DOES NOT PLAY DICE WITH THE UNIVERSE." - ALBERT EINSTEIN',
+                    '"THERE IS NO HEAVEN OR AFTERLIFE FOR BROKEN-DOWN COMPUTERS." - STEPHEN HAWKING',
+                    '"THE UNIVERSE IS A SIMULATION." - ELON MUSK',
+                    '"SCIENCE IS THE BELIEF IN THE IGNORANCE OF EXPERTS." - RICHARD FEYNMAN',
+                    '"I THINK THERE IS A WORLD MARKET FOR MAYBE FIVE COMPUTERS." - THOMAS WATSON (IBM)',
+                    '"THE INTERNET WILL FRAGMENTS." - ANDREW GROVE (INTEL)',
+                    '"640K OUGHT TO BE ENOUGH FOR ANYBODY." - BILL GATES',
+                    '"AI WILL BE THE WORST THING EVER FOR HUMANITY." - ELON MUSK',
+                    '"COMPUTERS ARE USELESS. THEY CAN ONLY GIVE YOU ANSWERS." - PABLO PICASSO',
+                    '"THE FUTURE IS ALREADY HERE – IT\'S JUST NOT EVENLY DISTRIBUTED." - WILLIAM GIBSON',
+                    'RANDOM CALC: SQRT(2) ≈ ' + Math.SQRT2.toFixed(5),
+                    'HEX CONVERSION: 255 = FF',
+                    'OCTAL CONVERSION: 255 = 377',
+                    'LOGARITHM: LN(10) ≈ ' + Math.LN10.toFixed(5),
+                    'EXPONENTIAL: E ≈ ' + Math.E.toFixed(5),
+                    'RANDOM FRACTION: ' + (Math.random()).toFixed(3),
+                    'VECTOR MAGNITUDE: ' + Math.sqrt(Math.random() * 100).toFixed(2),
+                    'TRIG FUNCTION: SIN(45°) ≈ ' + Math.sin(Math.PI / 4).toFixed(3),
+                    'COSINE: COS(60°) ≈ ' + Math.cos(Math.PI / 3).toFixed(3),
+                    'TANGENT: TAN(30°) ≈ ' + Math.tan(Math.PI / 6).toFixed(3),
+                    'MEMORY USAGE: ' + (Math.random() * 64).toFixed(1) + ' KB USED',
+                    'CPU LOAD: ' + (Math.random() * 100).toFixed(1) + '%',
+                    'DISK SPACE: ' + (Math.random() * 1000).toFixed(0) + ' BLOCKS FREE',
+                    'NETWORK PING: ' + (Math.random() * 100).toFixed(0) + ' MS',
+                    'BATTERY LEVEL: ' + (Math.random() * 100).toFixed(0) + '%',
+                    'SIGNAL STRENGTH: ' + (Math.random() * 100).toFixed(0) + '%',
+                    'ALTITUDE: ' + (Math.random() * 1000).toFixed(0) + ' METERS',
+                    'HUMIDITY: ' + (Math.random() * 100).toFixed(1) + '%',
+                    'PRESSURE: ' + (900 + Math.random() * 200).toFixed(0) + ' HPA',
+                    'WIND SPEED: ' + (Math.random() * 50).toFixed(1) + ' KM/H',
+                    'UV INDEX: ' + (Math.random() * 10).toFixed(1),
+                    'AIR QUALITY: ' + (Math.random() * 500).toFixed(0) + ' AQI',
+                    'SOLAR FLARE ACTIVITY: LEVEL ' + Math.floor(Math.random() * 5),
+                    'GRAVITY CONSTANT: G ≈ 6.67430E-11',
+                    'SPEED OF LIGHT: C ≈ 299792458 M/S',
+                    'PLANCK CONSTANT: H ≈ 6.62607015E-34',
+                    'BOLTZMANN CONSTANT: K ≈ 1.380649E-23',
+                    'FARADAY CONSTANT: F ≈ 96485.33212',
+                    'GAS CONSTANT: R ≈ 8.314462618'
+                ];
+                return replies[Math.floor(Math.random() * replies.length)];
+            }
+        });
+    </script>
+</body>
+</html>
